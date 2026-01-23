@@ -1,130 +1,358 @@
 # Laravel PDFMerger
 
-[![Latest Version on Packagist][ico-version]][link-packagist]
-[![Software License][ico-license]](LICENSE.md)
-[![Total Downloads][ico-downloads]][link-downloads]
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/stitch-digital/laravel-pdfmerger.svg?style=flat-square)](https://packagist.org/packages/stitch-digital/laravel-pdfmerger)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/stitch-digital/laravel-pdfmerger/tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/stitch-digital/laravel-pdfmerger/actions?query=workflow%3Atests+branch%3Amaster)
+[![GitHub Code Quality Action Status](https://img.shields.io/github/actions/workflow/status/stitch-digital/laravel-pdfmerger/code-quality.yml?branch=master&label=code%20quality&style=flat-square)](https://github.com/stitch-digital/laravel-pdfmerger/actions?query=workflow%3Acode-quality+branch%3Amaster)
+[![Total Downloads](https://img.shields.io/packagist/dt/stitch-digital/laravel-pdfmerger.svg?style=flat-square)](https://packagist.org/packages/stitch-digital/laravel-pdfmerger)
 
+A modern, fluent PDF merger for Laravel with full type safety and an elegant API. Merge multiple PDF files with ease using a developer-friendly interface.
 
-## Install
+<img src="laravel-pdfmerger.png" alt="Laravel PDFMerger">
 
-Via Composer
+## Features
 
-``` bash
-$ composer require stitch-digital/laravel-pdfmerger
+- 🚀 **Modern PHP**: Built for PHP 8.2+ with strict types
+- 🎯 **Fluent API**: Chainable methods following Laravel conventions
+- 🔒 **Type Safe**: Full type hints and return types for better IDE support
+- 🎨 **Laravel 9-11**: Compatible with Laravel 9, 10, and 11
+- 📦 **Auto-Discovery**: Zero configuration with Laravel package auto-discovery
+- 🧪 **Fully Tested**: Comprehensive test suite with PHPUnit
+- 📝 **Well Documented**: Clear examples and inline documentation
+
+## Requirements
+
+- PHP 8.2 or higher
+- Laravel 9.0, 10.0, or 11.0
+
+## Installation
+
+Install the package via Composer:
+
+```bash
+composer require stitch-digital/laravel-pdfmerger
 ```
 
-## Setup
+The package will automatically register itself via Laravel's package discovery.
 
-Add the service provider to the providers array in `config/app.php`.
+### Publish Configuration (Optional)
 
-``` php
-'providers' => [
-    ...
-    StitchDigital\PDFMerger\Providers\PDFMergerServiceProvider::class
-],
+You can publish the configuration file if you want to customize default settings:
 
-'aliases' => [
-    ...
-    'PDFMerger' => StitchDigital\PDFMerger\Facades\PDFMergerFacade::class
-]
+```bash
+php artisan vendor:publish --tag=pdfmerger-config
 ```
 
 ## Usage
-A basic usage example:
 
-``` php
+### Basic Example
+
+```php
 use StitchDigital\PDFMerger\Facades\PDFMergerFacade as PDFMerger;
 
-$oMerger = PDFMerger::init();
-
-$oMerger->addPDF('/path/to/project/vendors/stitch-digital/laravel-pdfmerger/src/PDFMerger/examples/pdf_one.pdf', [2]);
-$oMerger->addPDF('/path/to/project/vendors/stitch-digital/laravel-pdfmerger/src/PDFMerger/examples/pdf_two.pdf', 'all');
-
-$oMerger->merge();
-$oMerger->save('merged_result.pdf');
-
+PDFMerger::make()
+    ->addPDF('/path/to/first.pdf')
+    ->addPDF('/path/to/second.pdf')
+    ->merge()
+    ->save('merged_output.pdf');
 ```
 
-...add raw content data:
+### Fluent API with Method Chaining
 
-``` php
-$oMerger->addString(file_get_contents('/path/to/project/vendors/stitch-digital/laravel-pdfmerger/src/PDFMerger/examples/pdf_two.pdf'), [1]);
-
-```
-
-...select the pages you want to merge:
-
-``` php
-$oMerger->addPDF($file, 'all');  //Add all pages
-$oMerger->addPDF($file, [1]);    //Add page one only
-$oMerger->addPDF($file, [2]);    //Add page two only
-$oMerger->addPDF($file, [1, 3]); //Add page one and three only
-
-```
-
-...merge files together but add blank pages to support duplex printing:
 ```php
-$oMerger->duplexMerge();
+PDFMerger::make()
+    ->addPDF('/path/to/file1.pdf', pages: [1, 2, 3])
+    ->addPDF('/path/to/file2.pdf', pages: 'all')
+    ->addPDF('/path/to/file3.pdf', pages: [1])
+    ->merge()
+    ->save('output.pdf');
 ```
 
-...stream the merged content:
+### Selecting Specific Pages
 
-``` php
-$oMerger->stream();
-
-```
-...download the merged content:
-
-``` php
-$oMerger->download();
-
-```
-..get the raw content data:
-``` php
-echo $oMerger->output();
-
-```
-...set the filename if you don't want to do it later:
-
-``` php
-$oMerger->setFileName('example.pdf');
-
+```php
+PDFMerger::make()
+    ->addPDF($file, 'all')           // Add all pages
+    ->addPDF($file, [1])             // Add page 1 only
+    ->addPDF($file, [1, 3, 5])       // Add pages 1, 3, and 5
+    ->merge()
+    ->save();
 ```
 
-## Change log
+### Using Named Parameters (PHP 8.0+)
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+```php
+PDFMerger::make()
+    ->addPDF(
+        filePath: '/path/to/file.pdf',
+        pages: [1, 3, 5],
+        orientation: 'L'
+    )
+    ->merge()
+    ->save('output.pdf');
+```
+
+### Setting Orientation
+
+```php
+PDFMerger::make()
+    ->orientation('L')  // Set default landscape orientation
+    ->addPDF($file1)
+    ->addPDF($file2)
+    ->merge()
+    ->save();
+```
+
+### Duplex Printing Support
+
+Add blank pages between documents to support double-sided printing:
+
+```php
+PDFMerger::make()
+    ->duplex(true)
+    ->addPDF($file1)
+    ->addPDF($file2)
+    ->merge()
+    ->save();
+
+// Or use duplexMerge directly
+PDFMerger::make()
+    ->addPDF($file1)
+    ->addPDF($file2)
+    ->duplexMerge()
+    ->save();
+```
+
+### Working with String Content
+
+```php
+$pdfContent = file_get_contents('/path/to/file.pdf');
+
+PDFMerger::make()
+    ->addString($pdfContent, pages: [1, 2])
+    ->merge()
+    ->save();
+```
+
+### Output Methods
+
+```php
+$merger = PDFMerger::make()
+    ->addPDF($file1)
+    ->addPDF($file2)
+    ->merge();
+
+// Save to disk
+$merger->save('output.pdf');
+$merger->saveAs('output.pdf');  // Alias
+
+// Download in browser
+return $merger->download();
+
+// Stream to browser
+return $merger->stream();
+
+// Get as Response object
+return $merger->toResponse();
+
+// Get raw PDF content
+$content = $merger->output();
+
+// Get as base64 encoded string
+$base64 = $merger->toBase64();
+```
+
+### Method Aliases for Better Readability
+
+```php
+PDFMerger::make()
+    ->add($file)           // Alias for addPDF()
+    ->addFile($file)       // Alias for addPDF()
+    ->addAll($file)        // Shorthand for addPDF($file, 'all')
+    ->merge()
+    ->save();
+```
+
+### Adding Multiple Files at Once
+
+```php
+$files = [
+    ['path' => '/path/to/file1.pdf', 'pages' => [1, 2]],
+    ['path' => '/path/to/file2.pdf', 'pages' => 'all'],
+    ['path' => '/path/to/file3.pdf', 'pages' => [1]],
+];
+
+PDFMerger::make()
+    ->addMany($files)
+    ->merge()
+    ->save();
+```
+
+### Conditional Operations
+
+```php
+$merger = PDFMerger::make()
+    ->when($condition, fn($m) => $m->addPDF($file))
+    ->unless($otherCondition, fn($m) => $m->duplex(true))
+    ->merge();
+```
+
+### Using Tap for Side Effects
+
+```php
+PDFMerger::make()
+    ->addPDF($file1)
+    ->tap(fn() => logger('Added first file'))
+    ->addPDF($file2)
+    ->tap(fn() => logger('Added second file'))
+    ->merge()
+    ->save();
+```
+
+### Setting Custom Filename
+
+```php
+PDFMerger::make()
+    ->setFileName('my-merged-document.pdf')
+    ->addPDF($file1)
+    ->addPDF($file2)
+    ->merge()
+    ->save();  // Will use 'my-merged-document.pdf' as filename
+```
+
+### Resetting the Merger
+
+```php
+$merger = PDFMerger::make()
+    ->addPDF($file1)
+    ->merge()
+    ->save('first.pdf');
+
+// Reset and reuse
+$merger->reset()
+    ->addPDF($file2)
+    ->merge()
+    ->save('second.pdf');
+```
+
+## Error Handling
+
+The package throws specific exceptions for different error scenarios:
+
+```php
+use StitchDigital\PDFMerger\Exceptions\PDFNotFoundException;
+use StitchDigital\PDFMerger\Exceptions\InvalidPagesException;
+use StitchDigital\PDFMerger\Exceptions\PDFMergeException;
+
+try {
+    PDFMerger::make()
+        ->addPDF('/path/to/file.pdf')
+        ->merge()
+        ->save();
+} catch (PDFNotFoundException $e) {
+    // File not found
+} catch (InvalidPagesException $e) {
+    // Invalid pages parameter
+} catch (PDFMergeException $e) {
+    // General merge error
+}
+```
+
+## Configuration
+
+The published configuration file (`config/pdfmerger.php`) allows you to customize:
+
+- **temp_path**: Directory for temporary files
+- **output_path**: Default output directory
+- **orientation**: Default page orientation ('P' or 'L')
+- **duplex**: Enable duplex mode by default
+- **memory_limit**: Memory limit for large files (in MB)
+- **disk**: Default Storage disk for integration
+
+## Extending with Macros
+
+You can extend the package with custom methods using macros:
+
+```php
+use StitchDigital\PDFMerger\PDFMerger;
+
+PDFMerger::macro('addDirectory', function ($directory) {
+    foreach (glob($directory . '/*.pdf') as $file) {
+        $this->addPDF($file);
+    }
+    return $this;
+});
+
+// Usage
+PDFMerger::make()
+    ->addDirectory('/path/to/pdfs')
+    ->merge()
+    ->save();
+```
+
+## Upgrading from v1.x
+
+See [UPGRADING.md](UPGRADING.md) for detailed upgrade instructions.
+
+### Key Breaking Changes
+
+- Minimum PHP version is now 8.2
+- Minimum Laravel version is now 9.0
+- `init()` is deprecated, use `make()` instead
+- `merge()` now returns `self` instead of `void` for chaining
+- Hungarian notation removed from internal properties
 
 ## Testing
 
-``` bash
-$ composer test
+Run the test suite:
+
+```bash
+composer test
 ```
 
-## Security
+Run with coverage:
 
-If you discover any security related issues, please use the GitHub issue tracker.
+```bash
+composer test-coverage
+```
+
+## Code Quality
+
+Check code style:
+
+```bash
+composer format-check
+```
+
+Fix code style:
+
+```bash
+composer format
+```
+
+Run static analysis:
+
+```bash
+composer analyse
+```
+
+## Changelog
+
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+
+## Contributing
+
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+
+## Security Vulnerabilities
+
+Please review our [security policy](SECURITY.md) on how to report security vulnerabilities.
 
 ## Credits
 
-- [Stitch Digital][link-author]
-- [Webklex][link-original-author] (Original Author)
-- All Contributors
+- [Stitch Digital](https://github.com/stitch-digital) - Current Maintainer
+- [Webklex](https://github.com/webklex) - Original Author
+- [All Contributors](../../contributors)
 
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
-[ico-version]: https://img.shields.io/packagist/v/stitch-digital/laravel-pdfmerger.svg?style=flat-square
-[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/stitch-digital/laravel-pdfmerger.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/stitch-digital/laravel-pdfmerger.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/stitch-digital/laravel-pdfmerger.svg?style=flat-square
-
-[link-packagist]: https://packagist.org/packages/stitch-digital/laravel-pdfmerger
-[link-travis]: https://travis-ci.org/stitch-digital/laravel-pdfmerger
-[link-scrutinizer]: https://scrutinizer-ci.com/g/stitch-digital/laravel-pdfmerger/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/stitch-digital/laravel-pdfmerger
-[link-downloads]: https://packagist.org/packages/stitch-digital/laravel-pdfmerger
-[link-author]: https://github.com/stitch-digital
-[link-original-author]: https://github.com/webklex

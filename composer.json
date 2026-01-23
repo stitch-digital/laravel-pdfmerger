@@ -1,13 +1,15 @@
 {
     "name": "stitch-digital/laravel-pdfmerger",
     "type": "library",
-    "description": "Generic PDF merger for Laravel",
+    "description": "Modern PDF merger for Laravel with fluent API and full type safety",
     "keywords": [
         "stitch-digital",
         "laravel",
         "pdf",
         "merger",
-        "pdfmerger"
+        "pdfmerger",
+        "pdf-merge",
+        "laravel-pdf"
     ],
     "homepage": "https://github.com/stitch-digital/laravel-pdfmerger",
     "license": "MIT",
@@ -18,15 +20,18 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
-        "illuminate/support": ">=5.0",
-        "setasign/fpdf": "1.8.*",
-        "setasign/fpdi": "^2.0"
+        "php": "^8.2",
+        "illuminate/support": "^9.0|^10.0|^11.0",
+        "illuminate/http": "^9.0|^10.0|^11.0",
+        "illuminate/filesystem": "^9.0|^10.0|^11.0",
+        "setasign/fpdf": "^1.8",
+        "setasign/fpdi": "^2.6"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.*",
-        "scrutinizer/ocular": "~1.1",
-        "squizlabs/php_codesniffer": "~2.3"
+        "phpunit/phpunit": "^10.5|^11.0",
+        "orchestra/testbench": "^8.0|^9.0",
+        "laravel/pint": "^1.0",
+        "phpstan/phpstan": "^1.10"
     },
     "autoload": {
         "psr-4": {
@@ -35,15 +40,19 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "StitchDigital\\PDFMerger\\Test\\": "tests"
+            "StitchDigital\\PDFMerger\\Tests\\": "tests"
         }
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
+        "format": "vendor/bin/pint",
+        "format-check": "vendor/bin/pint --test",
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=2G"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "dev-master": "2.0-dev"
         },
         "laravel": {
             "providers": [
@@ -53,5 +62,12 @@
                 "PDFMerger": "StitchDigital\\PDFMerger\\Facades\\PDFMergerFacade"
             }
         }
-    }
+    },
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

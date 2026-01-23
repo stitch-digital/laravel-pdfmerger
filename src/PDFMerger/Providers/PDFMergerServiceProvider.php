@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
 * File:     PDFMergerServiceProvider.php
 * Category: Provider
@@ -17,27 +20,29 @@ use StitchDigital\PDFMerger\PDFMerger;
 
 class PDFMergerServiceProvider extends ServiceProvider
 {
-
     /**
      * Bootstrap the application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        //
+        $this->publishes([
+            __DIR__.'/../../config/pdfmerger.php' => config_path('pdfmerger.php'),
+        ], 'pdfmerger-config');
     }
 
     /**
      * Register the service provider.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
-        $this->app->singleton('PDFMerger', function ($app) {
-            $oPDFMerger = new PDFMerger($app['files']);
-            return $oPDFMerger;
+        $configPath = __DIR__.'/../../config/pdfmerger.php';
+
+        if (file_exists($configPath)) {
+            $this->mergeConfigFrom($configPath, 'pdfmerger');
+        }
+
+        $this->app->singleton('PDFMerger', function ($app): PDFMerger {
+            return new PDFMerger($app['files']);
         });
     }
 }
