@@ -36,7 +36,10 @@
     "autoload": {
         "psr-4": {
             "StitchDigital\\PDFMerger\\": "src/PDFMerger"
-        }
+        },
+        "files": [
+            "src/PDFMerger/polyfills.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
