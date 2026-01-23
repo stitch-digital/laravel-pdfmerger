@@ -20,7 +20,7 @@ We take the security of Laravel PDFMerger seriously. If you discover a security 
 
 ### Please DO:
 
-1. **Email us directly** at security@stitchdigital.com with:
+1. **Email us directly** at support@stitch.digital with:
    - A description of the vulnerability
    - Steps to reproduce the issue
    - Potential impact of the vulnerability
@@ -129,7 +129,7 @@ We follow **Coordinated Disclosure**:
 
 ## Contact
 
-For security concerns: security@stitchdigital.com
+For security concerns: support@stitch.digital
 
 For general issues: Use [GitHub Issues](https://github.com/stitch-digital/laravel-pdfmerger/issues)
 
