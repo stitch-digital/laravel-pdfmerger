@@ -10,10 +10,10 @@
 *  -
 */
 
-namespace Webklex\PDFMerger\Providers;
+namespace StitchDigital\PDFMerger\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Webklex\PDFMerger\PDFMerger;
+use StitchDigital\PDFMerger\PDFMerger;
 
 class PDFMergerServiceProvider extends ServiceProvider
 {

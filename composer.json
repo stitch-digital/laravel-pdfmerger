@@ -1,21 +1,20 @@
 {
-    "name": "webklex/laravel-pdfmerger",
+    "name": "stitch-digital/laravel-pdfmerger",
     "type": "library",
     "description": "Generic PDF merger for Laravel",
     "keywords": [
-        "webklex",
+        "stitch-digital",
         "laravel",
         "pdf",
         "merger",
         "pdfmerger"
     ],
-    "homepage": "https://github.com/webklex/pdfmerger",
+    "homepage": "https://github.com/stitch-digital/laravel-pdfmerger",
     "license": "MIT",
     "authors": [
         {
-            "name": "Malte Goldenbaum",
-            "email": "github@webklex.com",
-            "role": "Developer"
+            "name": "Stitch Digital",
+            "role": "Maintainer"
         }
     ],
     "require": {
@@ -31,12 +30,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Webklex\\PDFMerger\\": "src/PDFMerger"
+            "StitchDigital\\PDFMerger\\": "src/PDFMerger"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Webklex\\PDFMerger\\Test\\": "tests"
+            "StitchDigital\\PDFMerger\\Test\\": "tests"
         }
     },
     "scripts": {
@@ -48,10 +47,10 @@
         },
         "laravel": {
             "providers": [
-                "Webklex\\PDFMerger\\Providers\\PDFMergerServiceProvider"
+                "StitchDigital\\PDFMerger\\Providers\\PDFMergerServiceProvider"
             ],
             "aliases": {
-                "PDFMerger": "Webklex\\PDFMerger\\Facades\\PDFMergerFacade"
+                "PDFMerger": "StitchDigital\\PDFMerger\\Facades\\PDFMergerFacade"
             }
         }
     }
