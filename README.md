@@ -14,7 +14,8 @@ A modern, fluent PDF merger for Laravel with full type safety and an elegant API
 - 🚀 **Modern PHP**: Built for PHP 8.2+ with strict types
 - 🎯 **Fluent API**: Chainable methods following Laravel conventions
 - 🔒 **Type Safe**: Full type hints and return types for better IDE support
-- 🎨 **Laravel 9-11**: Compatible with Laravel 9, 10, and 11
+- 🎨 **Enum Support**: Use `Orientation` enum for better developer experience
+- 🎨 **Laravel 10-11**: Compatible with Laravel 10 and 11
 - 📦 **Auto-Discovery**: Zero configuration with Laravel package auto-discovery
 - 🧪 **Fully Tested**: Comprehensive test suite with PHPUnit
 - 📝 **Well Documented**: Clear examples and inline documentation
@@ -22,7 +23,7 @@ A modern, fluent PDF merger for Laravel with full type safety and an elegant API
 ## Requirements
 
 - PHP 8.2 or higher
-- Laravel 9.0, 10.0, or 11.0
+- Laravel 10.0 or 11.0
 
 ## Installation
 
@@ -81,11 +82,13 @@ PDFMerger::make()
 ### Using Named Parameters (PHP 8.0+)
 
 ```php
+use StitchDigital\PDFMerger\Enums\Orientation;
+
 PDFMerger::make()
     ->addPDF(
         filePath: '/path/to/file.pdf',
         pages: [1, 3, 5],
-        orientation: 'L'
+        orientation: Orientation::Landscape
     )
     ->merge()
     ->save('output.pdf');
@@ -93,11 +96,31 @@ PDFMerger::make()
 
 ### Setting Orientation
 
+You can set orientation using strings or the `Orientation` enum for better IDE support and type safety:
+
 ```php
+use StitchDigital\PDFMerger\Enums\Orientation;
+
+// Using enum (recommended)
 PDFMerger::make()
-    ->orientation('L')  // Set default landscape orientation
+    ->orientation(Orientation::Landscape)
     ->addPDF($file1)
     ->addPDF($file2)
+    ->merge()
+    ->save();
+
+// Using string (still supported)
+PDFMerger::make()
+    ->orientation('L')  // 'L' for Landscape, 'P' for Portrait
+    ->addPDF($file1)
+    ->addPDF($file2)
+    ->merge()
+    ->save();
+
+// Per-file orientation
+PDFMerger::make()
+    ->addPDF($file1, pages: 'all', orientation: Orientation::Portrait)
+    ->addPDF($file2, pages: 'all', orientation: Orientation::Landscape)
     ->merge()
     ->save();
 ```

@@ -15,7 +15,7 @@ Version 2.0 is a complete modernization of the package with significant improvem
 ### ⚠️ Breaking Changes
 
 - **PHP 8.2+ Required**: Minimum PHP version increased from 5.5.9 to 8.2
-- **Laravel 9+ Required**: Minimum Laravel version increased from 5.0 to 9.0
+- **Laravel 10+ Required**: Minimum Laravel version increased from 5.0 to 10.0 (Laravel 9 not supported as it reached end-of-life)
 - **Strict Types**: All files now use `declare(strict_types=1)` 
 - **Type Declarations**: Full type hints and return types on all methods
 - **Method Returns**: `merge()` and `duplexMerge()` now return `self` instead of `void` for method chaining
@@ -52,7 +52,7 @@ Version 2.0 is a complete modernization of the package with significant improvem
 #### Infrastructure & Quality
 - **GitHub Actions CI**: Complete CI/CD pipeline with matrix testing
   - Tests across PHP 8.2, 8.3, 8.4
-  - Tests across Laravel 9, 10, 11
+  - Tests across Laravel 10, 11
   - Tests with prefer-lowest and prefer-stable dependencies
 - **Code Quality Workflows**: Automated style and analysis checks
 - **Security Scanning**: Automated dependency auditing

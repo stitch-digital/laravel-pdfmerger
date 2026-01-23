@@ -25,6 +25,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use setasign\Fpdi\Fpdi as FPDI;
 use setasign\Fpdi\PdfParser\StreamReader;
+use StitchDigital\PDFMerger\Enums\Orientation;
 use StitchDigital\PDFMerger\Exceptions\InvalidPagesException;
 use StitchDigital\PDFMerger\Exceptions\PDFMergeException;
 use StitchDigital\PDFMerger\Exceptions\PDFNotFoundException;
@@ -40,7 +41,7 @@ class PDFMerger
     protected FPDI $fpdi;
 
     /**
-     * @var Collection<int, array{name: string, pages: string|array<int>, orientation: string|null}>
+     * @var Collection<int, array{name: string, pages: string|array<int>, orientation: Orientation|string|null}>
      */
     protected Collection $files;
 
@@ -51,7 +52,7 @@ class PDFMerger
 
     protected string $fileName = 'undefined.pdf';
 
-    protected ?string $defaultOrientation = null;
+    protected Orientation|string|null $defaultOrientation = null;
 
     protected bool $duplexMode = false;
 
@@ -126,7 +127,7 @@ class PDFMerger
     /**
      * Set the default orientation for all pages
      */
-    public function orientation(string $orientation): self
+    public function orientation(Orientation|string $orientation): self
     {
         $this->defaultOrientation = $orientation;
 
@@ -151,7 +152,7 @@ class PDFMerger
      * @throws PDFNotFoundException if the file doesn't exist
      * @throws InvalidPagesException if the pages parameter is invalid
      */
-    public function addPDF(string $filePath, string|array $pages = 'all', ?string $orientation = null): self
+    public function addPDF(string $filePath, string|array $pages = 'all', Orientation|string|null $orientation = null): self
     {
         if (! file_exists($filePath)) {
             throw new PDFNotFoundException("Could not locate PDF at '$filePath'");
@@ -183,7 +184,7 @@ class PDFMerger
      *
      * @param  string|array<int>  $pages
      */
-    public function add(string $filePath, string|array $pages = 'all', ?string $orientation = null): self
+    public function add(string $filePath, string|array $pages = 'all', Orientation|string|null $orientation = null): self
     {
         return $this->addPDF($filePath, $pages, $orientation);
     }
@@ -193,7 +194,7 @@ class PDFMerger
      *
      * @param  string|array<int>  $pages
      */
-    public function addFile(string $filePath, string|array $pages = 'all', ?string $orientation = null): self
+    public function addFile(string $filePath, string|array $pages = 'all', Orientation|string|null $orientation = null): self
     {
         return $this->addPDF($filePath, $pages, $orientation);
     }
@@ -201,7 +202,7 @@ class PDFMerger
     /**
      * Shorthand to add a PDF with all pages
      */
-    public function addAll(string $filePath, ?string $orientation = null): self
+    public function addAll(string $filePath, Orientation|string|null $orientation = null): self
     {
         return $this->addPDF($filePath, 'all', $orientation);
     }
@@ -209,7 +210,7 @@ class PDFMerger
     /**
      * Add multiple PDFs at once
      *
-     * @param  iterable<array{path: string, pages?: string|array<int>, orientation?: string|null}>  $files
+     * @param  iterable<array{path: string, pages?: string|array<int>, orientation?: Orientation|string|null}>  $files
      */
     public function addMany(iterable $files): self
     {
@@ -231,7 +232,7 @@ class PDFMerger
      *
      * @throws Exception
      */
-    public function addString(string $string, string|array $pages = 'all', ?string $orientation = null): self
+    public function addString(string $string, string|array $pages = 'all', Orientation|string|null $orientation = null): self
     {
         $filePath = storage_path('tmp/'.Str::random(16).'.pdf');
         $this->filesystem->put($filePath, $string);
@@ -255,7 +256,7 @@ class PDFMerger
      *
      * @throws PDFMergeException if there are no PDFs to merge
      */
-    public function merge(?string $orientation = null): self
+    public function merge(Orientation|string|null $orientation = null): self
     {
         $this->doMerge($orientation ?? $this->defaultOrientation, $this->duplexMode);
 
@@ -267,7 +268,7 @@ class PDFMerger
      *
      * @throws PDFMergeException if there are no PDFs to merge
      */
-    public function duplexMerge(?string $orientation = 'P'): self
+    public function duplexMerge(Orientation|string|null $orientation = 'P'): self
     {
         $this->doMerge($orientation ?? $this->defaultOrientation, true);
 
@@ -279,7 +280,7 @@ class PDFMerger
      *
      * @throws PDFMergeException
      */
-    protected function doMerge(?string $orientation, bool $duplexSafe): void
+    protected function doMerge(Orientation|string|null $orientation, bool $duplexSafe): void
     {
         if ($this->files->count() === 0) {
             throw new PDFMergeException('No PDFs to merge.');
@@ -289,6 +290,11 @@ class PDFMerger
 
         $this->files->each(function ($file) use ($fpdi, $orientation, $duplexSafe) {
             $file['orientation'] = $file['orientation'] ?? $orientation;
+
+            // Convert Orientation enum to string if needed
+            if ($file['orientation'] instanceof Orientation) {
+                $file['orientation'] = $file['orientation']->value;
+            }
 
             try {
                 $fileContent = file_get_contents($file['name']);

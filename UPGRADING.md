@@ -7,7 +7,7 @@ This guide will help you upgrade from Laravel PDFMerger v1.x to v2.0.
 Version 2.0 is a major modernization release that brings:
 
 - PHP 8.2+ with strict types
-- Laravel 9-11 support
+- Laravel 10-11 support (Laravel 9 is not supported)
 - Modern fluent API
 - Full type safety
 - Improved error handling
@@ -33,10 +33,10 @@ Version 2.0 is a major modernization release that brings:
 - Laravel >= 5.0
 
 **After (v2.0):**
-- Laravel 9.x, 10.x, or 11.x
+- Laravel 10.x or 11.x
 
 **Action Required:**
-- Upgrade to Laravel 9 or higher
+- Upgrade to Laravel 10 or higher
 - For Laravel 11, no manual provider registration needed (auto-discovery)
 
 ### 3. API Changes

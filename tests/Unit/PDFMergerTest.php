@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace StitchDigital\PDFMerger\Tests\Unit;
 
 use Illuminate\Filesystem\Filesystem;
+use StitchDigital\PDFMerger\Enums\Orientation;
 use StitchDigital\PDFMerger\Exceptions\InvalidPagesException;
 use StitchDigital\PDFMerger\Exceptions\PDFMergeException;
 use StitchDigital\PDFMerger\Exceptions\PDFNotFoundException;
@@ -107,6 +108,28 @@ class PDFMergerTest extends TestCase
     }
 
     /** @test */
+    public function it_can_set_orientation_with_enum(): void
+    {
+        $result = $this->merger->orientation(Orientation::Landscape);
+
+        $this->assertInstanceOf(PDFMerger::class, $result);
+    }
+
+    /** @test */
+    public function it_can_add_pdf_with_orientation_enum(): void
+    {
+        $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
+        file_put_contents($tempFile, '%PDF-1.4');
+
+        try {
+            $result = $this->merger->addPDF($tempFile, 'all', Orientation::Portrait);
+            $this->assertInstanceOf(PDFMerger::class, $result);
+        } finally {
+            unlink($tempFile);
+        }
+    }
+
+    /** @test */
     public function it_can_enable_duplex_mode(): void
     {
         $result = $this->merger->duplex(true);
@@ -142,6 +165,18 @@ class PDFMergerTest extends TestCase
 
         $result = $this->merger->when($condition, function ($merger) {
             return $merger->orientation('L');
+        });
+
+        $this->assertInstanceOf(PDFMerger::class, $result);
+    }
+
+    /** @test */
+    public function it_can_use_when_conditionally_with_enum(): void
+    {
+        $condition = true;
+
+        $result = $this->merger->when($condition, function ($merger) {
+            return $merger->orientation(Orientation::Landscape);
         });
 
         $this->assertInstanceOf(PDFMerger::class, $result);
