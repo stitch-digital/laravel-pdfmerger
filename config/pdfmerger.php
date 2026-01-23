@@ -64,8 +64,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Enable or disable the ability to add PDFs from remote URLs.
-    | When enabled, the package can download PDFs from http://, https://,
-    | or ftp:// URLs. Disable this in security-sensitive environments.
+    | When enabled, the package can download PDFs from http:// and https://
+    | URLs. Disable this in security-sensitive environments.
     |
     */
     'allow_urls' => true,

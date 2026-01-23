@@ -154,7 +154,7 @@ class PDFMerger
     protected function isUrl(string $path): bool
     {
         return (bool) filter_var($path, FILTER_VALIDATE_URL) &&
-               preg_match('/^(https?|ftp):\/\//i', $path);
+               preg_match('/^https?:\/\//i', $path);
     }
 
     /**
@@ -206,7 +206,12 @@ class PDFMerger
             }
 
             // Save to temp file
-            $this->filesystem->put($filePath, $content);
+            $result = $this->filesystem->put($filePath, $content);
+
+            if ($result === false) {
+                throw new PDFNotFoundException("Could not save downloaded PDF from '$url' to temporary file");
+            }
+
             $this->tmpFiles->push($filePath);
 
             return $filePath;
@@ -350,7 +355,12 @@ class PDFMerger
         }
 
         $filePath = $tempPath.'/'.Str::random(16).'.pdf';
-        $this->filesystem->put($filePath, $string);
+        $result = $this->filesystem->put($filePath, $string);
+
+        if ($result === false) {
+            throw new PDFMergeException('Could not save PDF string content to temporary file');
+        }
+
         $this->tmpFiles->push($filePath);
 
         return $this->addPDF($filePath, $pages, $orientation);

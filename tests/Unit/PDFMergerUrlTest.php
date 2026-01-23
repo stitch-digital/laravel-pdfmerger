@@ -49,7 +49,6 @@ class PDFMergerUrlTest extends TestCase
 
         $this->assertTrue($method->invoke($this->merger, 'http://example.com/file.pdf'));
         $this->assertTrue($method->invoke($this->merger, 'https://example.com/file.pdf'));
-        $this->assertTrue($method->invoke($this->merger, 'ftp://example.com/file.pdf'));
     }
 
     /** @test */
@@ -73,6 +72,7 @@ class PDFMergerUrlTest extends TestCase
         $method = $reflection->getMethod('isUrl');
         $method->setAccessible(true);
 
+        $this->assertFalse($method->invoke($this->merger, 'ftp://example.com/file.pdf'));
         $this->assertFalse($method->invoke($this->merger, 'file://path/to/file.pdf'));
         $this->assertFalse($method->invoke($this->merger, 'javascript:alert(1)'));
         $this->assertFalse($method->invoke($this->merger, 'data:text/html,<script>alert(1)</script>'));
