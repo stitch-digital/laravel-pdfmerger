@@ -60,6 +60,41 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Allow URLs
+    |--------------------------------------------------------------------------
+    |
+    | Enable or disable the ability to add PDFs from remote URLs.
+    | When enabled, the package can download PDFs from http:// and https://
+    | URLs. Disable this in security-sensitive environments.
+    |
+    */
+    'allow_urls' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | URL Download Timeout
+    |--------------------------------------------------------------------------
+    |
+    | The timeout (in seconds) for downloading PDFs from remote URLs.
+    | Increase this value if you're working with large files or slow networks.
+    |
+    */
+    'url_download_timeout' => 30,
+
+    /*
+    |--------------------------------------------------------------------------
+    | URL Verify SSL
+    |--------------------------------------------------------------------------
+    |
+    | Whether to verify SSL certificates when downloading PDFs from HTTPS URLs.
+    | It's recommended to keep this enabled for security. Only disable in
+    | development environments if working with self-signed certificates.
+    |
+    */
+    'url_verify_ssl' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Storage Disk
     |--------------------------------------------------------------------------
     |

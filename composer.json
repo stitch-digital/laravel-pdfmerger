@@ -51,7 +51,12 @@
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
         "format": "vendor/bin/pint",
         "format-check": "vendor/bin/pint --test",
-        "analyse": "vendor/bin/phpstan analyse --memory-limit=2G"
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=2G",
+        "review": [
+          "@format",
+          "@analyse",
+          "@test"
+        ]
     },
     "extra": {
         "branch-alias": {
