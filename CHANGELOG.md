@@ -58,7 +58,6 @@ Version 2.0 is a complete modernization of the package with significant improvem
 - **Security Scanning**: Automated dependency auditing
 - **Laravel Pint**: Code style enforcement (Laravel preset)
 - **PHPStan Level 8**: Strict static analysis
-- **Psalm Level 5**: Additional static analysis with security scanning
 - **Comprehensive Test Suite**: Unit and feature tests with Orchestra Testbench
 - **PHPUnit 10/11**: Modern testing framework
 
@@ -76,6 +75,9 @@ Version 2.0 is a complete modernization of the package with significant improvem
 - `Conditionable`: Adds `when()` and `unless()` methods
 - `Macroable`: Allows custom method extensions
 - `Tappable`: Adds `tap()` method
+
+#### Compatibility & Fixes
+- **PHP 8.0+ Polyfills**: Added polyfills for `get_magic_quotes_runtime()` and `get_magic_quotes_gpc()` to maintain compatibility with FPDF library on PHP 8.0+
 
 ### 🔧 Changed
 
