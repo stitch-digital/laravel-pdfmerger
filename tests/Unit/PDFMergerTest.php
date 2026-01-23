@@ -46,7 +46,7 @@ class PDFMergerTest extends TestCase
     public function it_throws_exception_when_pdf_file_not_found(): void
     {
         $this->expectException(PDFNotFoundException::class);
-        $this->expectExceptionMessage("Could not locate PDF at '/nonexistent/file.pdf'");
+        $this->expectExceptionMessage("Could not locate PDF file at '/nonexistent/file.pdf'");
 
         $this->merger->addPDF('/nonexistent/file.pdf');
     }

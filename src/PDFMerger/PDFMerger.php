@@ -149,18 +149,111 @@ class PDFMerger
     }
 
     /**
-     * Add a PDF for inclusion in the merge with a valid file path. Pages should be formatted: 1,3,6, 12-16.
+     * Check if a string is a URL
+     */
+    protected function isUrl(string $path): bool
+    {
+        return (bool) filter_var($path, FILTER_VALIDATE_URL) &&
+               preg_match('/^(https?|ftp):\/\//i', $path);
+    }
+
+    /**
+     * Download a PDF from a URL to a temporary file
+     *
+     * @throws PDFNotFoundException if the URL cannot be downloaded
+     */
+    protected function downloadUrl(string $url): string
+    {
+        // Check if URL downloads are allowed
+        if (! config('pdfmerger.allow_urls', true)) {
+            throw new PDFNotFoundException("URL downloads are disabled in configuration. Cannot download from '$url'");
+        }
+
+        $tempPath = config('pdfmerger.temp_path', storage_path('tmp/pdfmerger'));
+
+        // Ensure temp directory exists
+        if (! $this->filesystem->exists($tempPath)) {
+            $this->filesystem->makeDirectory($tempPath, 0755, true);
+        }
+
+        // Generate unique filename
+        $filePath = $tempPath.'/'.Str::random(16).'.pdf';
+
+        try {
+            // Set up context options for file_get_contents
+            $timeout = config('pdfmerger.url_download_timeout', 30);
+            $verifySSL = config('pdfmerger.url_verify_ssl', true);
+
+            $contextOptions = [
+                'http' => [
+                    'timeout' => $timeout,
+                    'follow_location' => true,
+                    'max_redirects' => 5,
+                ],
+                'ssl' => [
+                    'verify_peer' => $verifySSL,
+                    'verify_peer_name' => $verifySSL,
+                ],
+            ];
+
+            $context = stream_context_create($contextOptions);
+            $content = @file_get_contents($url, false, $context);
+
+            if ($content === false) {
+                $error = error_get_last();
+                $errorMessage = $error['message'] ?? 'Unknown error';
+                throw new PDFNotFoundException("Could not download PDF from '$url': $errorMessage");
+            }
+
+            // Save to temp file
+            $this->filesystem->put($filePath, $content);
+            $this->tmpFiles->push($filePath);
+
+            return $filePath;
+        } catch (Exception $e) {
+            // Clean up temp file if it was created
+            if ($this->filesystem->exists($filePath)) {
+                $this->filesystem->delete($filePath);
+            }
+
+            if ($e instanceof PDFNotFoundException) {
+                throw $e;
+            }
+
+            throw new PDFNotFoundException("Could not download PDF from '$url': {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    /**
+     * Resolve a path, handling both local filesystem paths and URLs
+     *
+     * @throws PDFNotFoundException if the file doesn't exist or cannot be downloaded
+     */
+    protected function resolvePath(string $path): string
+    {
+        if ($this->isUrl($path)) {
+            return $this->downloadUrl($path);
+        }
+
+        if (! file_exists($path)) {
+            throw new PDFNotFoundException("Could not locate PDF file at '$path'");
+        }
+
+        return $path;
+    }
+
+    /**
+     * Add a PDF for inclusion in the merge with a valid file path or URL. Pages should be formatted: 1,3,6, 12-16.
      *
      * @param  string|array<int>  $pages
      *
-     * @throws PDFNotFoundException if the file doesn't exist
+     * @throws PDFNotFoundException if the file doesn't exist or URL cannot be downloaded
      * @throws InvalidPagesException if the pages parameter is invalid
      */
     public function addPDF(string $filePath, string|array $pages = 'all', Orientation|string|null $orientation = null): self
     {
-        if (! file_exists($filePath)) {
-            throw new PDFNotFoundException("Could not locate PDF at '$filePath'");
-        }
+        // Resolve the path (handles both local paths and URLs)
+        $resolvedPath = $this->resolvePath($filePath);
 
         if (! is_array($pages) && strtolower($pages) !== 'all') {
             throw new InvalidPagesException("Invalid pages parameter for '$filePath'. Must be 'all' or an array of page numbers.");
@@ -175,7 +268,7 @@ class PDFMerger
         }
 
         $this->files->push([
-            'name' => $filePath,
+            'name' => $resolvedPath,
             'pages' => $pages,
             'orientation' => $orientation,
         ]);

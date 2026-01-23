@@ -14,6 +14,7 @@ A modern, fluent PDF merger for Laravel with full type safety and an elegant API
 - 🚀 **Modern PHP**: Built for PHP 8.2+ with strict types
 - 🎯 **Fluent API**: Chainable methods following Laravel conventions
 - 🔒 **Type Safe**: Full type hints and return types for better IDE support
+- 🌐 **URL Support**: Add PDFs from both local paths and remote URLs
 - 🎨 **Enum Support**: Use `Orientation` enum for better developer experience
 - 🎨 **Laravel 10-11**: Compatible with Laravel 10 and 11
 - 📦 **Auto-Discovery**: Zero configuration with Laravel package auto-discovery
@@ -156,6 +157,67 @@ PDFMerger::make()
     ->save();
 ```
 
+### Using URLs (Remote PDFs)
+
+The package can automatically download and merge PDFs from remote URLs:
+
+```php
+// Using remote URLs
+PDFMerger::make()
+    ->addPDF('https://example.com/document1.pdf')
+    ->addPDF('https://example.com/document2.pdf')
+    ->merge()
+    ->save('merged.pdf');
+
+// With Laravel's asset() helper
+PDFMerger::make()
+    ->addAll(asset('pdfs/document1.pdf'))
+    ->addAll(asset('pdfs/document2.pdf'))
+    ->merge()
+    ->save('merged.pdf');
+
+// Mix local and remote PDFs
+PDFMerger::make()
+    ->addPDF('/local/path/document.pdf')
+    ->addPDF('https://example.com/remote-document.pdf')
+    ->addPDF(public_path('pdfs/another.pdf'))
+    ->merge()
+    ->save();
+
+// URLs support all the same options as local files
+PDFMerger::make()
+    ->addPDF('https://example.com/doc.pdf', pages: [1, 3, 5])
+    ->addPDF('https://example.com/doc2.pdf', orientation: Orientation::Landscape)
+    ->merge()
+    ->save();
+```
+
+Downloaded PDFs are automatically stored in temporary files and cleaned up after the merge operation completes.
+
+#### URL Security Configuration
+
+URL downloads can be configured in `config/pdfmerger.php`:
+
+```php
+return [
+    // Enable or disable URL downloads
+    'allow_urls' => true,
+    
+    // Timeout for URL downloads (seconds)
+    'url_download_timeout' => 30,
+    
+    // Verify SSL certificates for HTTPS URLs
+    'url_verify_ssl' => true,
+];
+```
+
+**Security Notes:**
+- URL downloads are enabled by default but can be disabled via configuration
+- SSL certificate verification is enabled by default for HTTPS URLs
+- Downloaded files are stored in temporary storage and automatically cleaned up
+- Consider disabling URL support (`allow_urls => false`) in security-sensitive environments
+- Only use URLs from trusted sources to prevent potential security risks
+
 ### Output Methods
 
 ```php
@@ -272,7 +334,11 @@ try {
         ->merge()
         ->save();
 } catch (PDFNotFoundException $e) {
-    // File not found
+    // File not found or URL download failed
+    // Examples:
+    // - "Could not locate PDF file at '/path/to/file.pdf'"
+    // - "Could not download PDF from 'https://example.com/file.pdf': Connection timeout"
+    // - "URL downloads are disabled in configuration"
 } catch (InvalidPagesException $e) {
     // Invalid pages parameter
 } catch (PDFMergeException $e) {
@@ -289,6 +355,9 @@ The published configuration file (`config/pdfmerger.php`) allows you to customiz
 - **orientation**: Default page orientation ('P' or 'L')
 - **duplex**: Enable duplex mode by default
 - **memory_limit**: Memory limit for large files (in MB)
+- **allow_urls**: Enable/disable URL downloads (default: `true`)
+- **url_download_timeout**: Timeout for URL downloads in seconds (default: `30`)
+- **url_verify_ssl**: Verify SSL certificates for HTTPS URLs (default: `true`)
 - **disk**: Default Storage disk for integration
 
 ## Extending with Macros
