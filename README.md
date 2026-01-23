@@ -201,19 +201,33 @@ URL downloads can be configured in `config/pdfmerger.php`:
 ```php
 return [
     // Enable or disable URL downloads
-    'allow_urls' => true,
+    'allow_urls' => env('PDFMERGER_ALLOW_URLS', true),
     
     // Timeout for URL downloads (seconds)
-    'url_download_timeout' => 30,
+    'url_download_timeout' => env('PDFMERGER_DOWNLOAD_TIMEOUT', 30),
     
     // Verify SSL certificates for HTTPS URLs
-    'url_verify_ssl' => true,
+    'url_verify_ssl' => env('PDFMERGER_VERIFY_SSL', true),
 ];
+```
+
+**Automatic Local Development Support:**
+
+SSL verification is **automatically disabled** when `APP_ENV=local`, making it work seamlessly with local domains like `.test`, `.local`, or self-signed certificates. No configuration needed!
+
+**For production environments**, SSL verification is automatically enabled when `APP_ENV=production`, ensuring secure connections.
+
+You can override this behavior in your `.env` if needed:
+
+```env
+PDFMERGER_VERIFY_SSL=false  # Force disable SSL verification
 ```
 
 **Security Notes:**
 - URL downloads are enabled by default but can be disabled via configuration
-- SSL certificate verification is enabled by default for HTTPS URLs
+- SSL certificate verification is **automatically managed based on environment** (`local` vs `production`)
+- SSL verification is **always disabled in local environments** for developer convenience
+- SSL verification is **always enabled in production** for security (unless explicitly overridden)
 - Downloaded files are stored in temporary storage and automatically cleaned up
 - Consider disabling URL support (`allow_urls => false`) in security-sensitive environments
 - Only use URLs from trusted sources to prevent potential security risks

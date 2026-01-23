@@ -67,8 +67,10 @@ return [
     | When enabled, the package can download PDFs from http:// and https://
     | URLs. Disable this in security-sensitive environments.
     |
+    | Can be controlled via PDFMERGER_ALLOW_URLS in your .env
+    |
     */
-    'allow_urls' => true,
+    'allow_urls' => env('PDFMERGER_ALLOW_URLS', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -78,8 +80,10 @@ return [
     | The timeout (in seconds) for downloading PDFs from remote URLs.
     | Increase this value if you're working with large files or slow networks.
     |
+    | Can be controlled via PDFMERGER_DOWNLOAD_TIMEOUT in your .env
+    |
     */
-    'url_download_timeout' => 30,
+    'url_download_timeout' => env('PDFMERGER_DOWNLOAD_TIMEOUT', 30),
 
     /*
     |--------------------------------------------------------------------------
@@ -87,11 +91,16 @@ return [
     |--------------------------------------------------------------------------
     |
     | Whether to verify SSL certificates when downloading PDFs from HTTPS URLs.
-    | It's recommended to keep this enabled for security. Only disable in
-    | development environments if working with self-signed certificates.
+    | Enabled by default for security in production environments.
+    |
+    | Note: SSL verification is automatically disabled when APP_ENV=local
+    | to support local development domains like .test, .local, etc.
+    | This happens automatically - no configuration needed!
+    |
+    | You can manually override via PDFMERGER_VERIFY_SSL in your .env file.
     |
     */
-    'url_verify_ssl' => true,
+    'url_verify_ssl' => env('PDFMERGER_VERIFY_SSL', true),
 
     /*
     |--------------------------------------------------------------------------
