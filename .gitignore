@@ -1,3 +1,20 @@
 vendor
 composer.lock
 .idea
+.vscode
+.DS_Store
+Thumbs.db
+*.cache
+*.log
+
+# PHPUnit
+.phpunit.cache
+build/
+coverage/
+
+# Laravel
+storage/tmp/
+storage/logs/
+
+# Testing
+tests/Fixtures/output/
