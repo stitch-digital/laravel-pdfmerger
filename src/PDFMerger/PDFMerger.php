@@ -57,6 +57,11 @@ class PDFMerger
     protected bool $duplexMode = false;
 
     /**
+     * Track whether merge has been performed
+     */
+    protected bool $merged = false;
+
+    /**
      * Construct and initialize a new instance
      */
     public function __construct(Filesystem $filesystem)
@@ -111,6 +116,7 @@ class PDFMerger
         $this->fileName = 'undefined.pdf';
         $this->defaultOrientation = config('pdfmerger.orientation');
         $this->duplexMode = config('pdfmerger.duplex', false);
+        $this->merged = false;
 
         return $this;
     }
@@ -149,12 +155,48 @@ class PDFMerger
     }
 
     /**
+     * Normalize a URL by removing extra whitespace and encoding spaces
+     */
+    protected function normalizeUrl(string $url): string
+    {
+        // Trim whitespace from the entire URL
+        $url = trim($url);
+
+        // Replace multiple consecutive spaces with a single space
+        $normalized = preg_replace('/\s+/', ' ', $url);
+
+        // Handle case where preg_replace returns null
+        if ($normalized === null) {
+            return $url;
+        }
+
+        $url = $normalized;
+
+        // Encode spaces and other special characters in the URL
+        // We need to be careful to only encode the path part, not the scheme/host
+        if (preg_match('/^(https?:\/\/[^\/]+)(.*)$/i', $url, $matches)) {
+            $baseUrl = $matches[1];
+            $path = $matches[2];
+
+            // Encode spaces in the path
+            $path = str_replace(' ', '%20', $path);
+
+            return $baseUrl.$path;
+        }
+
+        return $url;
+    }
+
+    /**
      * Check if a string is a URL
      */
     protected function isUrl(string $path): bool
     {
-        return (bool) filter_var($path, FILTER_VALIDATE_URL) &&
-               preg_match('/^https?:\/\//i', $path);
+        // Normalize the path first for validation
+        $normalizedPath = $this->normalizeUrl($path);
+
+        return (bool) filter_var($normalizedPath, FILTER_VALIDATE_URL) &&
+               preg_match('/^https?:\/\//i', $normalizedPath);
     }
 
     /**
@@ -164,6 +206,12 @@ class PDFMerger
      */
     protected function downloadUrl(string $url): string
     {
+        // Store original URL for debugging
+        $originalUrl = $url;
+
+        // Normalize the URL to handle whitespace and encoding issues
+        $url = $this->normalizeUrl($url);
+
         // Check if URL downloads are allowed
         if (! config('pdfmerger.allow_urls', true)) {
             throw new PDFNotFoundException("URL downloads are disabled in configuration. Cannot download from '$url'");
@@ -184,6 +232,12 @@ class PDFMerger
             $timeout = config('pdfmerger.url_download_timeout', 30);
             $verifySSL = config('pdfmerger.url_verify_ssl', true);
 
+            // Automatically disable SSL verification in local development environments
+            // This makes it work with .test, .local domains and self-signed certificates
+            if (app()->environment('local')) {
+                $verifySSL = false;
+            }
+
             $contextOptions = [
                 'http' => [
                     'timeout' => $timeout,
@@ -202,7 +256,45 @@ class PDFMerger
             if ($content === false) {
                 $error = error_get_last();
                 $errorMessage = $error['message'] ?? 'Unknown error';
-                throw new PDFNotFoundException("Could not download PDF from '$url': $errorMessage");
+
+                // Check for SSL certificate errors
+                $isSSLError = str_contains($errorMessage, 'SSL') ||
+                             str_contains($errorMessage, 'certificate') ||
+                             str_contains($errorMessage, 'crypto');
+
+                if ($isSSLError) {
+                    $envInfo = app()->environment('local')
+                        ? 'SSL verification is already disabled for local environments.'
+                        : 'You can disable SSL verification by setting APP_ENV=local or PDFMERGER_VERIFY_SSL=false in your .env file.';
+
+                    $sslHelp = "\n\nSSL Error Detected:\n".
+                              "The server's SSL certificate could not be verified.\n".
+                              $envInfo."\n\n".
+                              'Alternatively, use http:// instead of https:// for local domains.';
+
+                    throw new PDFNotFoundException(
+                        "Could not download PDF from '$url': $errorMessage".$sslHelp
+                    );
+                }
+
+                // Get HTTP response headers for better debugging
+                $headers = @get_headers($url, true);
+                $httpCode = $headers ? (isset($headers[0]) ? $headers[0] : 'No response') : 'Could not retrieve headers';
+
+                // Include both original and normalized URLs in error for debugging
+                if ($originalUrl !== $url) {
+                    throw new PDFNotFoundException(
+                        "Could not download PDF from '$originalUrl' (normalized to '$url'): $errorMessage\n".
+                        "HTTP Response: $httpCode\n".
+                        'Please ensure the URL is accessible and returns a PDF file.'
+                    );
+                }
+
+                throw new PDFNotFoundException(
+                    "Could not download PDF from '$url': $errorMessage\n".
+                    "HTTP Response: $httpCode\n".
+                    'Please ensure the URL is accessible and returns a PDF file.'
+                );
             }
 
             // Save to temp file
@@ -383,7 +475,10 @@ class PDFMerger
      */
     public function merge(Orientation|string|null $orientation = null): self
     {
-        $this->doMerge($orientation ?? $this->defaultOrientation, $this->duplexMode);
+        if (! $this->merged) {
+            $this->doMerge($orientation ?? $this->defaultOrientation, $this->duplexMode);
+            $this->merged = true;
+        }
 
         return $this;
     }
@@ -395,7 +490,10 @@ class PDFMerger
      */
     public function duplexMerge(Orientation|string|null $orientation = null): self
     {
-        $this->doMerge($orientation ?? $this->defaultOrientation, true);
+        if (! $this->merged) {
+            $this->doMerge($orientation ?? $this->defaultOrientation, true);
+            $this->merged = true;
+        }
 
         return $this;
     }
@@ -484,6 +582,10 @@ class PDFMerger
      */
     public function output(): string
     {
+        if (! $this->merged) {
+            $this->merge();
+        }
+
         return $this->fpdi->Output($this->fileName, 'S');
     }
 
@@ -492,6 +594,10 @@ class PDFMerger
      */
     public function stream(): mixed
     {
+        if (! $this->merged) {
+            $this->merge();
+        }
+
         return $this->fpdi->Output($this->fileName, 'I');
     }
 
