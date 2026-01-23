@@ -370,6 +370,10 @@ class PDFMerger
             'orientation' => $orientation,
         ]);
 
+        // Reset merged flag when new files are added
+        // This ensures that subsequent merge/output calls will re-merge with all files
+        $this->merged = false;
+
         return $this;
     }
 
@@ -476,6 +480,9 @@ class PDFMerger
     public function merge(Orientation|string|null $orientation = null): self
     {
         if (! $this->merged) {
+            // Reset FPDI instance to prevent issues with re-merging
+            $this->fpdi = new FPDI;
+            
             $this->doMerge($orientation ?? $this->defaultOrientation, $this->duplexMode);
             $this->merged = true;
         }
@@ -491,6 +498,9 @@ class PDFMerger
     public function duplexMerge(Orientation|string|null $orientation = null): self
     {
         if (! $this->merged) {
+            // Reset FPDI instance to prevent issues with re-merging
+            $this->fpdi = new FPDI;
+            
             $this->doMerge($orientation ?? $this->defaultOrientation, true);
             $this->merged = true;
         }
