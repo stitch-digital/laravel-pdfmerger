@@ -41,7 +41,7 @@ class PDFMergerRemergeTest extends TestCase
     protected function getTestPdf(int $number = 1): string
     {
         $examplesPath = __DIR__.'/../../src/PDFMerger/examples';
-        
+
         return match ($number) {
             1 => $examplesPath.'/pdf_one.pdf',
             2 => $examplesPath.'/pdf_two.pdf',
@@ -69,19 +69,19 @@ class PDFMergerRemergeTest extends TestCase
 
         // Call output again - should now have 3 pages
         $output2 = $this->merger->output();
-        
+
         // The output should be different because it includes the third file
         // Note: We can't compare exact content due to FPDI internals, but we can verify
         // that merge was re-triggered by checking that the output contains PDF structure
         $this->assertStringContainsString('PDF', $output2);
-        
+
         // Verify the third file was actually included by checking the internal state
         // We'll use reflection to check if merged flag was reset
         $reflection = new \ReflectionClass($this->merger);
         $filesProperty = $reflection->getProperty('files');
         $filesProperty->setAccessible(true);
         $files = $filesProperty->getValue($this->merger);
-        
+
         // Should have 3 files in the collection
         $this->assertCount(3, $files);
     }
@@ -147,7 +147,7 @@ class PDFMergerRemergeTest extends TestCase
         $reflection = new \ReflectionClass($this->merger);
         $mergedProperty = $reflection->getProperty('merged');
         $mergedProperty->setAccessible(true);
-        
+
         // After adding a new file, merged should be false
         $this->assertFalse($mergedProperty->getValue($this->merger));
     }
@@ -182,7 +182,7 @@ class PDFMergerRemergeTest extends TestCase
         $filesProperty = $reflection->getProperty('files');
         $filesProperty->setAccessible(true);
         $files = $filesProperty->getValue($this->merger);
-        
+
         $this->assertCount(3, $files);
     }
 
@@ -232,10 +232,10 @@ class PDFMergerRemergeTest extends TestCase
         // Both files should exist and be valid
         $this->assertTrue($this->filesystem->exists($outputFile1));
         $this->assertTrue($this->filesystem->exists($outputFile2));
-        
+
         $content1 = $this->filesystem->get($outputFile1);
         $content2 = $this->filesystem->get($outputFile2);
-        
+
         $this->assertStringContainsString('PDF', $content1);
         $this->assertStringContainsString('PDF', $content2);
     }

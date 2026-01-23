@@ -482,7 +482,7 @@ class PDFMerger
         if (! $this->merged) {
             // Reset FPDI instance to prevent issues with re-merging
             $this->fpdi = new FPDI;
-            
+
             $this->doMerge($orientation ?? $this->defaultOrientation, $this->duplexMode);
             $this->merged = true;
         }
@@ -500,7 +500,7 @@ class PDFMerger
         if (! $this->merged) {
             // Reset FPDI instance to prevent issues with re-merging
             $this->fpdi = new FPDI;
-            
+
             $this->doMerge($orientation ?? $this->defaultOrientation, true);
             $this->merged = true;
         }
