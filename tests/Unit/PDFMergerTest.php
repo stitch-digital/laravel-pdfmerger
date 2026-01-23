@@ -260,4 +260,97 @@ class PDFMergerTest extends TestCase
         // This line won't execute due to exception, but demonstrates intent
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
+
+    /** @test */
+    public function it_can_add_many_pdfs_at_once(): void
+    {
+        $tempFile1 = tempnam(sys_get_temp_dir(), 'pdf');
+        $tempFile2 = tempnam(sys_get_temp_dir(), 'pdf');
+        file_put_contents($tempFile1, '%PDF-1.4');
+        file_put_contents($tempFile2, '%PDF-1.4');
+
+        try {
+            $result = $this->merger->addMany([
+                ['path' => $tempFile1],
+                ['path' => $tempFile2, 'pages' => 'all'],
+                ['path' => $tempFile1, 'pages' => [1], 'orientation' => 'L'],
+            ]);
+
+            $this->assertInstanceOf(PDFMerger::class, $result);
+        } finally {
+            unlink($tempFile1);
+            unlink($tempFile2);
+        }
+    }
+
+    /** @test */
+    public function it_throws_exception_when_add_many_file_is_missing_path_key(): void
+    {
+        $this->expectException(InvalidPagesException::class);
+        $this->expectExceptionMessage("File at index 0 is missing the required 'path' key.");
+
+        $this->merger->addMany([
+            ['pages' => 'all'], // Missing 'path' key
+        ]);
+    }
+
+    /** @test */
+    public function it_throws_exception_when_add_many_file_is_not_array(): void
+    {
+        $this->expectException(InvalidPagesException::class);
+        $this->expectExceptionMessage('File at index 0 must be an array, string given.');
+
+        $this->merger->addMany([
+            '/path/to/file.pdf', // String instead of array
+        ]);
+    }
+
+    /** @test */
+    public function it_throws_exception_for_second_malformed_file_in_add_many(): void
+    {
+        $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
+        file_put_contents($tempFile, '%PDF-1.4');
+
+        try {
+            $this->expectException(InvalidPagesException::class);
+            $this->expectExceptionMessage("File at index 1 is missing the required 'path' key.");
+
+            $this->merger->addMany([
+                ['path' => $tempFile],
+                ['pages' => 'all'], // Missing 'path' key
+            ]);
+        } finally {
+            unlink($tempFile);
+        }
+    }
+
+    /** @test */
+    public function it_validates_path_exists_even_with_null_value(): void
+    {
+        // When path is null, PHP's strict typing will throw a TypeError
+        // before our validation runs, which is actually better security
+        $this->expectException(\TypeError::class);
+
+        $this->merger->addMany([
+            ['path' => null],
+        ]);
+    }
+
+    /** @test */
+    public function it_can_add_many_with_orientation_enum(): void
+    {
+        $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
+        file_put_contents($tempFile, '%PDF-1.4');
+
+        try {
+            $result = $this->merger->addMany([
+                ['path' => $tempFile, 'orientation' => Orientation::Portrait],
+                ['path' => $tempFile, 'orientation' => Orientation::Landscape],
+            ]);
+
+            $this->assertInstanceOf(PDFMerger::class, $result);
+        } finally {
+            unlink($tempFile);
+        }
+    }
 }

@@ -65,6 +65,10 @@ class PDFMerger
         $this->fpdi = new FPDI;
         $this->files = collect([]);
         $this->tmpFiles = collect([]);
+
+        // Load configuration defaults
+        $this->defaultOrientation = config('pdfmerger.orientation');
+        $this->duplexMode = config('pdfmerger.duplex', false);
     }
 
     /**
@@ -105,8 +109,8 @@ class PDFMerger
         $this->fpdi = new FPDI;
         $this->files = collect([]);
         $this->fileName = 'undefined.pdf';
-        $this->defaultOrientation = null;
-        $this->duplexMode = false;
+        $this->defaultOrientation = config('pdfmerger.orientation');
+        $this->duplexMode = config('pdfmerger.duplex', false);
 
         return $this;
     }
@@ -210,11 +214,22 @@ class PDFMerger
     /**
      * Add multiple PDFs at once
      *
-     * @param  iterable<array{path: string, pages?: string|array<int>, orientation?: Orientation|string|null}>  $files
+     * @param  iterable<mixed>  $files  Array of file configurations, each should contain 'path' key and optional 'pages' and 'orientation' keys
+     *
+     * @throws InvalidPagesException if a file array is missing the required 'path' key or is not an array
+     * @throws PDFNotFoundException if the file doesn't exist
      */
     public function addMany(iterable $files): self
     {
-        foreach ($files as $file) {
+        foreach ($files as $index => $file) {
+            if (! is_array($file)) {
+                throw new InvalidPagesException("File at index $index must be an array, ".gettype($file).' given.');
+            }
+
+            if (! isset($file['path']) && ! array_key_exists('path', $file)) {
+                throw new InvalidPagesException("File at index $index is missing the required 'path' key.");
+            }
+
             $this->addPDF(
                 $file['path'],
                 $file['pages'] ?? 'all',
@@ -234,7 +249,14 @@ class PDFMerger
      */
     public function addString(string $string, string|array $pages = 'all', Orientation|string|null $orientation = null): self
     {
-        $filePath = storage_path('tmp/'.Str::random(16).'.pdf');
+        $tempPath = config('pdfmerger.temp_path', storage_path('tmp'));
+
+        // Ensure temp directory exists
+        if (! $this->filesystem->exists($tempPath)) {
+            $this->filesystem->makeDirectory($tempPath, 0755, true);
+        }
+
+        $filePath = $tempPath.'/'.Str::random(16).'.pdf';
         $this->filesystem->put($filePath, $string);
         $this->tmpFiles->push($filePath);
 
@@ -268,7 +290,7 @@ class PDFMerger
      *
      * @throws PDFMergeException if there are no PDFs to merge
      */
-    public function duplexMerge(Orientation|string|null $orientation = 'P'): self
+    public function duplexMerge(Orientation|string|null $orientation = null): self
     {
         $this->doMerge($orientation ?? $this->defaultOrientation, true);
 
@@ -284,6 +306,12 @@ class PDFMerger
     {
         if ($this->files->count() === 0) {
             throw new PDFMergeException('No PDFs to merge.');
+        }
+
+        // Set memory limit from config if available
+        $memoryLimit = config('pdfmerger.memory_limit');
+        if ($memoryLimit) {
+            ini_set('memory_limit', $memoryLimit.'M');
         }
 
         $fpdi = $this->fpdi;
@@ -406,7 +434,25 @@ class PDFMerger
      */
     public function save(?string $filePath = null): bool
     {
-        $result = $this->filesystem->put($filePath ?? $this->fileName, $this->output());
+        // Use provided path, or fall back to configured output_path + fileName
+        if ($filePath === null) {
+            $outputPath = config('pdfmerger.output_path', storage_path('app/pdfs'));
+
+            // Ensure output directory exists
+            if (! $this->filesystem->exists($outputPath)) {
+                $this->filesystem->makeDirectory($outputPath, 0755, true);
+            }
+
+            $filePath = $outputPath.'/'.$this->fileName;
+        } else {
+            // If explicit path provided, ensure parent directory exists
+            $directory = dirname($filePath);
+            if (! $this->filesystem->exists($directory)) {
+                $this->filesystem->makeDirectory($directory, 0755, true);
+            }
+        }
+
+        $result = $this->filesystem->put($filePath, $this->output());
 
         return $result !== false;
     }

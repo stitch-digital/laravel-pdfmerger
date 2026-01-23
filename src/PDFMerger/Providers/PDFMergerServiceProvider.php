@@ -26,7 +26,7 @@ class PDFMergerServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__.'/../../config/pdfmerger.php' => config_path('pdfmerger.php'),
+            __DIR__.'/../../../config/pdfmerger.php' => config_path('pdfmerger.php'),
         ], 'pdfmerger-config');
     }
 
@@ -35,7 +35,7 @@ class PDFMergerServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $configPath = __DIR__.'/../../config/pdfmerger.php';
+        $configPath = __DIR__.'/../../../config/pdfmerger.php';
 
         if (file_exists($configPath)) {
             $this->mergeConfigFrom($configPath, 'pdfmerger');
