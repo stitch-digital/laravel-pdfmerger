@@ -278,8 +278,8 @@ class PDFMerger
                 }
 
                 // Get HTTP response headers for better debugging
-                $headers = @get_headers($url, true);
-                $httpCode = $headers ? (isset($headers[0]) ? $headers[0] : 'No response') : 'Could not retrieve headers';
+                $headers = @get_headers($url);
+                $httpCode = $headers ? $headers[0] : 'Could not retrieve headers';
 
                 // Include both original and normalized URLs in error for debugging
                 if ($originalUrl !== $url) {

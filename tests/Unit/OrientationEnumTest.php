@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace StitchDigital\PDFMerger\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use StitchDigital\PDFMerger\Enums\Orientation;
 use StitchDigital\PDFMerger\Tests\TestCase;
 
 class OrientationEnumTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_has_portrait_case(): void
     {
         $this->assertEquals('P', Orientation::Portrait->value);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_landscape_case(): void
     {
         $this->assertEquals('L', Orientation::Landscape->value);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_used_in_switch_statements(): void
     {
         $orientation = Orientation::Portrait;

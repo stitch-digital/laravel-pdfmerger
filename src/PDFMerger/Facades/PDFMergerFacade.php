@@ -17,6 +17,7 @@ namespace StitchDigital\PDFMerger\Facades;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Facade;
+use StitchDigital\PDFMerger\PDFMerger;
 
 /**
  * @method static \StitchDigital\PDFMerger\PDFMerger make()
@@ -45,7 +46,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \StitchDigital\PDFMerger\PDFMerger unless($value = null, callable $callback = null, callable $default = null)
  * @method static \StitchDigital\PDFMerger\PDFMerger tap(callable $callback = null)
  *
- * @see \StitchDigital\PDFMerger\PDFMerger
+ * @see PDFMerger
  */
 class PDFMergerFacade extends Facade
 {

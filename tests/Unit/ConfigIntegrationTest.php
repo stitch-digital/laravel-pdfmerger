@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace StitchDigital\PDFMerger\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use StitchDigital\PDFMerger\PDFMerger;
 use StitchDigital\PDFMerger\Tests\TestCase;
 
@@ -19,7 +20,7 @@ class ConfigIntegrationTest extends TestCase
         $app['config']->set('pdfmerger.memory_limit', 512);
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_default_orientation_from_config(): void
     {
         $merger = PDFMerger::make();
@@ -32,7 +33,7 @@ class ConfigIntegrationTest extends TestCase
         $this->assertEquals('L', $property->getValue($merger));
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_duplex_mode_from_config(): void
     {
         $merger = PDFMerger::make();
@@ -45,7 +46,7 @@ class ConfigIntegrationTest extends TestCase
         $this->assertTrue($property->getValue($merger));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_override_config_defaults(): void
     {
         $merger = PDFMerger::make()
@@ -64,7 +65,7 @@ class ConfigIntegrationTest extends TestCase
         $this->assertFalse($duplexProperty->getValue($merger));
     }
 
-    /** @test */
+    #[Test]
     public function it_resets_to_config_defaults_not_hardcoded_values(): void
     {
         $merger = PDFMerger::make()
