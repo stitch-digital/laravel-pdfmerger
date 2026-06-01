@@ -6,6 +6,7 @@ namespace StitchDigital\PDFMerger\Tests\Unit;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
+use PHPUnit\Framework\Attributes\Test;
 use StitchDigital\PDFMerger\Exceptions\PDFNotFoundException;
 use StitchDigital\PDFMerger\PDFMerger;
 use StitchDigital\PDFMerger\Tests\TestCase;
@@ -40,7 +41,7 @@ class PDFMergerUrlTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_detects_http_urls(): void
     {
         $reflection = new \ReflectionClass($this->merger);
@@ -51,7 +52,7 @@ class PDFMergerUrlTest extends TestCase
         $this->assertTrue($method->invoke($this->merger, 'https://example.com/file.pdf'));
     }
 
-    /** @test */
+    #[Test]
     public function it_detects_non_urls(): void
     {
         $reflection = new \ReflectionClass($this->merger);
@@ -65,7 +66,7 @@ class PDFMergerUrlTest extends TestCase
         $this->assertFalse($method->invoke($this->merger, ''));
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_invalid_url_schemes(): void
     {
         $reflection = new \ReflectionClass($this->merger);
@@ -78,7 +79,7 @@ class PDFMergerUrlTest extends TestCase
         $this->assertFalse($method->invoke($this->merger, 'data:text/html,<script>alert(1)</script>'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_pdf_from_local_path(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
@@ -92,7 +93,7 @@ class PDFMergerUrlTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_for_nonexistent_local_file(): void
     {
         $this->expectException(PDFNotFoundException::class);
@@ -101,7 +102,7 @@ class PDFMergerUrlTest extends TestCase
         $this->merger->addPDF('/nonexistent/file.pdf');
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_urls_are_disabled(): void
     {
         Config::set('pdfmerger.allow_urls', false);
@@ -112,7 +113,7 @@ class PDFMergerUrlTest extends TestCase
         $this->merger->addPDF('https://example.com/file.pdf');
     }
 
-    /** @test */
+    #[Test]
     public function it_downloads_pdf_from_url(): void
     {
         // Create a mock PDF content
@@ -184,7 +185,7 @@ startxref
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_temp_directory_if_not_exists(): void
     {
         $tempPath = sys_get_temp_dir().'/pdfmerger_test_new';
@@ -215,7 +216,7 @@ startxref
         $this->filesystem->deleteDirectory($tempPath);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_multiple_pdfs_with_mixed_sources(): void
     {
         $tempFile1 = tempnam(sys_get_temp_dir(), 'pdf');
@@ -236,7 +237,7 @@ startxref
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_add_all_with_local_path(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
@@ -250,7 +251,7 @@ startxref
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_add_alias_with_local_path(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
@@ -264,7 +265,7 @@ startxref
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_add_file_alias_with_local_path(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
@@ -278,7 +279,7 @@ startxref
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_add_many_with_local_paths(): void
     {
         $tempFile1 = tempnam(sys_get_temp_dir(), 'pdf');
@@ -299,7 +300,7 @@ startxref
         }
     }
 
-    /** @test */
+    #[Test]
     public function resolve_path_returns_same_path_for_local_file(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
@@ -317,7 +318,7 @@ startxref
         }
     }
 
-    /** @test */
+    #[Test]
     public function resolve_path_throws_exception_for_nonexistent_file(): void
     {
         $this->expectException(PDFNotFoundException::class);
@@ -330,7 +331,7 @@ startxref
         $method->invoke($this->merger, '/nonexistent/path.pdf');
     }
 
-    /** @test */
+    #[Test]
     public function it_respects_url_download_timeout_config(): void
     {
         Config::set('pdfmerger.url_download_timeout', 5);
@@ -339,7 +340,7 @@ startxref
         $this->assertEquals(5, config('pdfmerger.url_download_timeout'));
     }
 
-    /** @test */
+    #[Test]
     public function it_respects_url_verify_ssl_config(): void
     {
         Config::set('pdfmerger.url_verify_ssl', false);
@@ -348,7 +349,7 @@ startxref
         $this->assertFalse(config('pdfmerger.url_verify_ssl'));
     }
 
-    /** @test */
+    #[Test]
     public function add_string_still_works(): void
     {
         $pdfContent = '%PDF-1.4
@@ -373,7 +374,7 @@ startxref
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_cleans_up_temp_files_on_destruct(): void
     {
         $tempPath = sys_get_temp_dir().'/pdfmerger_test';

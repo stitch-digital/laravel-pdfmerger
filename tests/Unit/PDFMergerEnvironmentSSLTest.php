@@ -7,6 +7,7 @@ namespace StitchDigital\PDFMerger\Tests\Unit;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
+use PHPUnit\Framework\Attributes\Test;
 use StitchDigital\PDFMerger\PDFMerger;
 use StitchDigital\PDFMerger\Tests\TestCase;
 
@@ -38,7 +39,7 @@ class PDFMergerEnvironmentSSLTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function ssl_verification_is_disabled_in_local_environment(): void
     {
         // Set environment to local
@@ -54,7 +55,7 @@ class PDFMergerEnvironmentSSLTest extends TestCase
         $this->assertTrue(config('pdfmerger.url_verify_ssl'));
     }
 
-    /** @test */
+    #[Test]
     public function ssl_verification_respects_config_in_production(): void
     {
         // Set environment to production
@@ -69,7 +70,7 @@ class PDFMergerEnvironmentSSLTest extends TestCase
         $this->assertTrue(config('pdfmerger.url_verify_ssl'));
     }
 
-    /** @test */
+    #[Test]
     public function environment_can_be_checked(): void
     {
         // Verify we can check the environment
@@ -80,7 +81,7 @@ class PDFMergerEnvironmentSSLTest extends TestCase
         $this->assertEquals('testing', $env);
     }
 
-    /** @test */
+    #[Test]
     public function config_can_override_ssl_verification(): void
     {
         // Set explicit false value

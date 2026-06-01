@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace StitchDigital\PDFMerger\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use StitchDigital\PDFMerger\PDFMerger;
 use StitchDigital\PDFMerger\Tests\TestCase;
 
@@ -15,7 +16,7 @@ class ConfigDefaultsTest extends TestCase
         // Config will return defaults from config/pdfmerger.php
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_portrait_as_default_orientation_when_config_not_customized(): void
     {
         $merger = PDFMerger::make();
@@ -29,7 +30,7 @@ class ConfigDefaultsTest extends TestCase
         $this->assertEquals('P', $property->getValue($merger));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_false_as_default_duplex_when_config_not_customized(): void
     {
         $merger = PDFMerger::make();

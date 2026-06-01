@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace StitchDigital\PDFMerger\Tests;
 
 use Orchestra\Testbench\TestCase as Orchestra;
+use StitchDigital\PDFMerger\Facades\PDFMergerFacade;
 use StitchDigital\PDFMerger\Providers\PDFMergerServiceProvider;
 
 abstract class TestCase extends Orchestra
@@ -19,7 +20,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageAliases($app): array
     {
         return [
-            'PDFMerger' => \StitchDigital\PDFMerger\Facades\PDFMergerFacade::class,
+            'PDFMerger' => PDFMergerFacade::class,
         ];
     }
 

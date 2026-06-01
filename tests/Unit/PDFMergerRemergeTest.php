@@ -6,6 +6,7 @@ namespace StitchDigital\PDFMerger\Tests\Unit;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
+use PHPUnit\Framework\Attributes\Test;
 use StitchDigital\PDFMerger\PDFMerger;
 use StitchDigital\PDFMerger\Tests\TestCase;
 
@@ -49,7 +50,7 @@ class PDFMergerRemergeTest extends TestCase
         };
     }
 
-    /** @test */
+    #[Test]
     public function it_includes_files_added_after_merge(): void
     {
         // Get test PDFs
@@ -130,7 +131,7 @@ class PDFMergerRemergeTest extends TestCase
         $this->assertTrue($mergedProperty->getValue($this->merger), 'merged flag should be true after output');
     }
 
-    /** @test */
+    #[Test]
     public function it_remerges_when_adding_files_after_merge(): void
     {
         // Get test PDFs
@@ -152,7 +153,7 @@ class PDFMergerRemergeTest extends TestCase
         $this->assertFalse($mergedProperty->getValue($this->merger));
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_multiple_remerges(): void
     {
         // Get test PDFs
@@ -186,7 +187,7 @@ class PDFMergerRemergeTest extends TestCase
         $this->assertCount(3, $files);
     }
 
-    /** @test */
+    #[Test]
     public function it_remerges_when_using_stream_after_adding_files(): void
     {
         // Get test PDFs
@@ -210,7 +211,7 @@ class PDFMergerRemergeTest extends TestCase
         $this->assertStringContainsString('PDF', $output2);
     }
 
-    /** @test */
+    #[Test]
     public function it_remerges_when_using_save_after_adding_files(): void
     {
         // Get test PDFs

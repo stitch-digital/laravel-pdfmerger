@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace StitchDigital\PDFMerger\Tests\Unit;
 
 use Illuminate\Support\Facades\File;
+use PHPUnit\Framework\Attributes\Test;
 use StitchDigital\PDFMerger\PDFMerger;
 use StitchDigital\PDFMerger\Tests\TestCase;
 
@@ -33,7 +34,7 @@ class ConfigPathsTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_temp_files_in_configured_path(): void
     {
         $merger = PDFMerger::make();
@@ -53,7 +54,7 @@ class ConfigPathsTest extends TestCase
         $this->assertCount(1, $files);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_files_to_configured_output_path_when_no_path_specified(): void
     {
         $merger = PDFMerger::make();
@@ -73,7 +74,7 @@ class ConfigPathsTest extends TestCase
         $this->assertTrue(File::exists(storage_path('test/output/merged.pdf')));
     }
 
-    /** @test */
+    #[Test]
     public function it_respects_explicit_path_over_config(): void
     {
         $merger = PDFMerger::make();

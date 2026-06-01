@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace StitchDigital\PDFMerger\Tests\Unit;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use StitchDigital\PDFMerger\Enums\Orientation;
 use StitchDigital\PDFMerger\Exceptions\InvalidPagesException;
 use StitchDigital\PDFMerger\Exceptions\PDFMergeException;
@@ -22,27 +23,27 @@ class PDFMergerTest extends TestCase
         $this->merger = new PDFMerger(new Filesystem);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_instantiated(): void
     {
         $this->assertInstanceOf(PDFMerger::class, $this->merger);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_make_factory_method(): void
     {
         $merger = PDFMerger::make();
         $this->assertInstanceOf(PDFMerger::class, $merger);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_new_factory_method(): void
     {
         $merger = PDFMerger::new();
         $this->assertInstanceOf(PDFMerger::class, $merger);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_pdf_file_not_found(): void
     {
         $this->expectException(PDFNotFoundException::class);
@@ -51,7 +52,7 @@ class PDFMergerTest extends TestCase
         $this->merger->addPDF('/nonexistent/file.pdf');
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_for_invalid_pages_parameter(): void
     {
         $this->expectException(InvalidPagesException::class);
@@ -67,7 +68,7 @@ class PDFMergerTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_for_invalid_page_numbers(): void
     {
         $this->expectException(InvalidPagesException::class);
@@ -82,7 +83,7 @@ class PDFMergerTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_merging_without_files(): void
     {
         $this->expectException(PDFMergeException::class);
@@ -91,7 +92,7 @@ class PDFMergerTest extends TestCase
         $this->merger->merge();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_filename(): void
     {
         $result = $this->merger->setFileName('test.pdf');
@@ -99,7 +100,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_orientation(): void
     {
         $result = $this->merger->orientation('L');
@@ -107,7 +108,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_orientation_with_enum(): void
     {
         $result = $this->merger->orientation(Orientation::Landscape);
@@ -115,7 +116,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_pdf_with_orientation_enum(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
@@ -129,7 +130,7 @@ class PDFMergerTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_can_enable_duplex_mode(): void
     {
         $result = $this->merger->duplex(true);
@@ -137,7 +138,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_supports_method_chaining(): void
     {
         $result = $this->merger
@@ -148,7 +149,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reset_instance(): void
     {
         $this->merger->setFileName('test.pdf')->orientation('L');
@@ -158,7 +159,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_when_conditionally(): void
     {
         $condition = true;
@@ -170,7 +171,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_when_conditionally_with_enum(): void
     {
         $condition = true;
@@ -182,7 +183,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_unless_conditionally(): void
     {
         $condition = false;
@@ -194,7 +195,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_tap(): void
     {
         $tapped = false;
@@ -207,7 +208,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_add_alias_for_add_pdf(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
@@ -221,7 +222,7 @@ class PDFMergerTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_has_add_file_alias_for_add_pdf(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
@@ -235,7 +236,7 @@ class PDFMergerTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_has_add_all_shorthand(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
@@ -249,7 +250,7 @@ class PDFMergerTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function merge_returns_self_for_chaining(): void
     {
         // Skip actual merge test as it requires valid PDF files
@@ -261,7 +262,7 @@ class PDFMergerTest extends TestCase
         $this->assertInstanceOf(PDFMerger::class, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_many_pdfs_at_once(): void
     {
         $tempFile1 = tempnam(sys_get_temp_dir(), 'pdf');
@@ -283,7 +284,7 @@ class PDFMergerTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_add_many_file_is_missing_path_key(): void
     {
         $this->expectException(InvalidPagesException::class);
@@ -294,7 +295,7 @@ class PDFMergerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_add_many_file_is_not_array(): void
     {
         $this->expectException(InvalidPagesException::class);
@@ -305,7 +306,7 @@ class PDFMergerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_for_second_malformed_file_in_add_many(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
@@ -324,7 +325,7 @@ class PDFMergerTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_path_exists_even_with_null_value(): void
     {
         // When path is null, PHP's strict typing will throw a TypeError
@@ -336,7 +337,7 @@ class PDFMergerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_many_with_orientation_enum(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
