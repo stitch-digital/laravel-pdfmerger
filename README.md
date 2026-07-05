@@ -16,7 +16,7 @@ A modern, fluent PDF merger for Laravel with full type safety and an elegant API
 - 🔒 **Type Safe**: Full type hints and return types for better IDE support
 - 🌐 **URL Support**: Add PDFs from both local paths and remote URLs
 - 🎨 **Enum Support**: Use `Orientation` enum for better developer experience
-- 🎨 **Laravel 10-11**: Compatible with Laravel 10 and 11
+- 🧩 **Laravel 10-12**: Compatible with Laravel 10, 11, and 12
 - 📦 **Auto-Discovery**: Zero configuration with Laravel package auto-discovery
 - 🧪 **Fully Tested**: Comprehensive test suite with PHPUnit
 - 📝 **Well Documented**: Clear examples and inline documentation
@@ -24,7 +24,7 @@ A modern, fluent PDF merger for Laravel with full type safety and an elegant API
 ## Requirements
 
 - PHP 8.2 or higher
-- Laravel 10.0 or 11.0
+- Laravel 10.0, 11.0, or 12.0
 
 ## Installation
 
@@ -402,7 +402,7 @@ See [UPGRADING.md](UPGRADING.md) for detailed upgrade instructions.
 ### Key Breaking Changes
 
 - Minimum PHP version is now 8.2
-- Minimum Laravel version is now 9.0
+- Minimum Laravel version is now 10.0
 - `init()` is deprecated, use `make()` instead
 - `merge()` now returns `self` instead of `void` for chaining
 - Hungarian notation removed from internal properties
